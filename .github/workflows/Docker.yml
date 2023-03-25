@@ -29,7 +29,7 @@ jobs:
       uses: docker/build-push-action@v4.0.0
       with:
         context: .
-        file: ./Dockerfilçe
+        file: ./Dockerfile
         push: true
         tags: matheuslfavaretto/go_ci:${{github.ref_name}}
 
