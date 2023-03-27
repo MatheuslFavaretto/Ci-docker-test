@@ -1,21 +1,19 @@
-name: Deploy EC2
+name: Entrega Continua
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
-  deploy_ec2:
+  EC2:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v2.1.1
+
+      - name: Download main compilado
+        uses: actions/download-artifact@v3.0.0
         with:
           name: programa
-      #- uses: actions/checkout@v3
 
       - name: Deploy to Staging server
         uses: easingthemes/ssh-deploy@main
@@ -26,21 +24,19 @@ jobs:
           TARGET: /home/${{ secrets.REMOTE_USER }}
           EXCLUDE: "postgres-data"
 
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v0.1.8
+      - name: executing remote ssh commands
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            export HOST=${{ secrets.DBHOST }}
-            export USER=${{ secrets.DBUSER }}
-            export PASSWORD=${{ secrets.DBPASSWORD }}
-            export DBNAME=${{ secrets.DBNAME }}
-            export DBPORT=${{ secrets.DBPORT }}
+            export HOST=${{ secrets.DB_HOST }}
+            export USER=${{ secrets.DB_USER }}
+            export PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DBNAME=${{ secrets.DB_NAME }}
+            export DBPORT=${{ secrets.DB_PORT }}
             export PORT=8000
             chmod +x main
             nohup ./main > nohup.out 2> nohup.err < /dev/null &
-
-
